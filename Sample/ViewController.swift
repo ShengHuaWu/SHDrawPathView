@@ -9,11 +9,25 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    let drawPathView = SHDrawPathView(frame: CGRectZero);
 
+    // MARK: View life cycle
     override func loadView() {
-        let drawPathView = SHDrawPathView(frame: CGRectZero);
-        drawPathView.backgroundColor = UIColor.whiteColor()
-        self.view = drawPathView
+        self.drawPathView.backgroundColor = UIColor.whiteColor()
+        self.view = self.drawPathView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let leftBarButton = UIBarButtonItem(title: "Change Color", style: UIBarButtonItemStyle.Plain, target: self, action: "changeColor")
+        self.navigationItem.leftBarButtonItem = leftBarButton
+    }
+    
+    // MARK: Button action
+    func changeColor() {
+        self.drawPathView.strokeColor = UIColor.redColor()
     }
 
 }

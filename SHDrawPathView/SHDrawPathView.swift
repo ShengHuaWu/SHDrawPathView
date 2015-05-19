@@ -10,7 +10,7 @@ import UIKit
 
 public class SHDrawPathView: UIView {
 
-    public var color: UIColor = UIColor.blueColor() {
+    public var strokeColor: UIColor = UIColor.blueColor() {
         didSet {
             self.setNeedsDisplay()
         }
@@ -39,7 +39,7 @@ public class SHDrawPathView: UIView {
     // MARK: Draw rect
     public override func drawRect(rect: CGRect) {
         if !self.path.empty {
-            self.color.setStroke()
+            self.strokeColor.setStroke()
             self.path.stroke()
         }
     }
