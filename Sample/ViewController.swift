@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         let leftBarButton = UIBarButtonItem(title: "Change Color", style: UIBarButtonItemStyle.Plain, target: self, action: "changeColor")
-        self.navigationItem.leftBarButtonItem = leftBarButton
+        self.navigationItem.setLeftBarButtonItem(leftBarButton, animated: true)
     }
     
     // MARK: Button action
