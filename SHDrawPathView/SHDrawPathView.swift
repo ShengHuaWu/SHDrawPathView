@@ -10,7 +10,14 @@ import UIKit
 
 public class SHDrawPathView: UIView {
 
+    public var color: UIColor = UIColor.blueColor() {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
     private let path: UIBezierPath = UIBezierPath()
+    private let tolerance: CGFloat = 10
     
     // MARK: Designated initializer
     public override init(frame: CGRect) {
@@ -31,8 +38,10 @@ public class SHDrawPathView: UIView {
     
     // MARK: Draw rect
     public override func drawRect(rect: CGRect) {
-        UIColor.blueColor().setStroke()
-        self.path.stroke()
+        if !self.path.empty {
+            self.color.setStroke()
+            self.path.stroke()
+        }
     }
     
     // MARK: Touch events
@@ -49,8 +58,20 @@ public class SHDrawPathView: UIView {
         
         let touch: UITouch = touches.first as! UITouch
         let point = touch.locationInView(self)
-        self.path.addLineToPoint(point)
-        self.setNeedsDisplay()
+        let shouldDraw = self.path.currentPoint.distanceFromPoint(point) >= self.tolerance
+        if shouldDraw {
+            self.path.addLineToPoint(point)
+            self.setNeedsDisplay()
+        }
     }
     
+}
+
+// MARK: Calculate distance
+extension CGPoint {
+    func distanceFromPoint(point: CGPoint) -> CGFloat {
+        let x = self.x - point.x
+        let y = self.y - point.y
+        return sqrt(x * x + y * y)
+    }
 }
