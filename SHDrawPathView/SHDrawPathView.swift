@@ -11,7 +11,7 @@ import UIKit
 public class SHDrawPathView: UIView {
 
     // MARK: Public property
-    public var strokeColor: UIColor = UIColor.blueColor() {
+    public var strokeColor = UIColor.blueColor() {
         didSet {
             self.setNeedsLayout()
         }
@@ -23,16 +23,15 @@ public class SHDrawPathView: UIView {
     }
     
     // MARK: Private propery
-    private let path: UIBezierPath = UIBezierPath()
-    private let tolerance: CGFloat = 10
-    private let backgroundImageView: UIImageView
+    private let path = UIBezierPath()
+    private let tolerance: CGFloat = 10.0
+    private let backgroundImageView = UIImageView(frame: CGRectZero)
     
     // MARK: Designated initializer
     public override init(frame: CGRect) {
         self.path.lineCapStyle = kCGLineCapRound
         self.path.lineJoinStyle = kCGLineJoinRound
         self.path.lineWidth = self.strokeWidth
-        self.backgroundImageView = UIImageView(frame: CGRectZero)
         
         super.init(frame: frame)
         self.backgroundColor = UIColor.clearColor()
@@ -43,7 +42,6 @@ public class SHDrawPathView: UIView {
         self.path.lineCapStyle = kCGLineCapRound
         self.path.lineJoinStyle = kCGLineJoinRound
         self.path.lineWidth = self.strokeWidth
-        self.backgroundImageView = UIImageView(frame: CGRectZero)
         
         super.init(coder: aDecoder)
         self.backgroundColor = UIColor.clearColor()
@@ -82,16 +80,34 @@ public class SHDrawPathView: UIView {
         return self.path.currentPoint.distanceFromPoint(point) >= self.tolerance
     }
     
-    // MARK: Render
+    // MARK: Render image
+    func strokePathInContext(context: CGContextRef) {
+        if self.path.empty {
+            return
+        }
+        
+        CGContextSaveGState(context)
+        self.strokeColor.setStroke()
+        self.path.stroke()
+        CGContextRestoreGState(context)
+    }
+    
+    func renderImageForRect(rect: CGRect) -> UIImage {
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        CGContextClearRect(context, rect)
+        
+        self.strokePathInContext(context)
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
+    }
+    
     func renderImageInBackgroundForRect(rect: CGRect) {
         NSOperationQueue().addOperationWithBlock { () -> Void in
-            UIGraphicsBeginImageContext(rect.size)
-            if !self.path.empty {
-                self.strokeColor.setStroke()
-                self.path.stroke()
-            }
-            let image = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
+            let image = self.renderImageForRect(rect)
             
             NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
                 self.backgroundImageView.image = image
@@ -103,9 +119,12 @@ public class SHDrawPathView: UIView {
 
 // MARK: Calculate distance
 extension CGPoint {
+    
     func distanceFromPoint(point: CGPoint) -> CGFloat {
         let x = self.x - point.x
         let y = self.y - point.y
+        
         return sqrt(x * x + y * y)
     }
+    
 }
