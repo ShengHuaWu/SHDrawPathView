@@ -10,12 +10,19 @@ import UIKit
 
 public class SHDrawPathView: UIView {
 
+    // MARK: Public property
     public var strokeColor: UIColor = UIColor.blueColor() {
         didSet {
             self.setNeedsDisplay()
         }
     }
+    public var strokeWidth: CGFloat = 3.0 {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
     
+    // MARK: Private propery
     private let path: UIBezierPath = UIBezierPath()
     private let tolerance: CGFloat = 10
     
@@ -23,6 +30,7 @@ public class SHDrawPathView: UIView {
     public override init(frame: CGRect) {
         self.path.lineCapStyle = kCGLineCapRound
         self.path.lineJoinStyle = kCGLineJoinRound
+        self.path.lineWidth = self.strokeWidth
         
         super.init(frame: frame)
         self.backgroundColor = UIColor.clearColor()
@@ -31,6 +39,7 @@ public class SHDrawPathView: UIView {
     public required init(coder aDecoder: NSCoder) {
         self.path.lineCapStyle = kCGLineCapRound
         self.path.lineJoinStyle = kCGLineJoinRound
+        self.path.lineWidth = self.strokeWidth
         
         super.init(coder: aDecoder)
         self.backgroundColor = UIColor.clearColor()
@@ -58,11 +67,15 @@ public class SHDrawPathView: UIView {
         
         let touch: UITouch = touches.first as! UITouch
         let point = touch.locationInView(self)
-        let shouldDraw = self.path.currentPoint.distanceFromPoint(point) >= self.tolerance
-        if shouldDraw {
+        if self.shouldDrawPathToPoint(point) {
             self.path.addLineToPoint(point)
             self.setNeedsDisplay()
         }
+    }
+    
+    // MARK: Tolerance
+    func shouldDrawPathToPoint(point: CGPoint) -> Bool {
+        return self.path.currentPoint.distanceFromPoint(point) >= self.tolerance
     }
     
 }
